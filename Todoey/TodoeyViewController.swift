@@ -9,9 +9,20 @@
 import UIKit
 
 class TodoeyViewController: UITableViewController {
-    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    
+    var defaults = UserDefaults.standard
+    
+    
+    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t" ]
+    
+    
+    var tikMark = [false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false]
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.defaults.setValue(self.itemArray, forKey: "toDoList")
+        if let items = defaults.object(forKey: "toDoList") as? [String] {
+            itemArray = items
+        }
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -26,11 +37,15 @@ class TodoeyViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        
+        if tikMark[indexPath.row] {
+            tikMark[indexPath.row] = false
         } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            tikMark[indexPath.row] = true 
         }
+        
+        tableView.cellForRow(at: indexPath)?.accessoryType =  tikMark[indexPath.row] ? .checkmark : .none
+        
         tableView.deselectRow(at: indexPath, animated: true )
     }
 
@@ -51,6 +66,8 @@ class TodoeyViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { act in
             print( textTyped.text ?? "")
             self.itemArray.append(textTyped.text!)
+            
+            self.defaults.setValue(self.itemArray, forKey: "toDoList")
             
             
             self.tableView.reloadData()
