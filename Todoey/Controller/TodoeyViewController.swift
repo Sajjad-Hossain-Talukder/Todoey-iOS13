@@ -7,28 +7,23 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoeyViewController: UITableViewController {
-    
+    /*
     var defaults = UserDefaults.standard
-    
     let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask ).first?.appendingPathComponent("Items.plist")
-
+     */
     
-    var itemArray :[Item] = []
+    let context = ( UIApplication.shared.delegate as! AppDelegate ).persistentContainer.viewContext
+    var itemArray = [Item]()
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-       
-        
-        
-        
-        print(filePath)
-        
-        
-        
-        loadData()
+    
+        //print(filePath)
+        //loadData()
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -50,6 +45,8 @@ class TodoeyViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true )
     }
     
+    
+    //MARK: - Add BUTTON PRESSED
 
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
@@ -64,49 +61,72 @@ class TodoeyViewController: UITableViewController {
 
         let action = UIAlertAction(title: "Add Item", style: .default) { act in
             
-            var item = Item(title: textTyped.text ?? "")
-            self.itemArray.append(item)
+            /*
+                Codable Class Part :
+                 var item = ItemOld(title: textTyped.text ?? "")
+                 self.itemArray.append(item)
+                 self.saveData()
+             */
+            
+            let newItem = Item(context: self.context)
+            newItem.title = textTyped.text
+            newItem.done = false 
+            self.itemArray.append(newItem)
             self.saveData()
             
         }
+        
         alert.addAction(action)
         present(alert,animated: true , completion: nil )
         
     }
     
-    
+    //MARK: - SAVE DATA
+
     
     func saveData() {
-        let encoder = PropertyListEncoder()
-        
-        do {
-            let data = try encoder.encode(self.itemArray)
-            try data.write(to: self.filePath!)
+        do{
+            try context.save()
         } catch {
-            print("Catched Array while inserting \(error)")
+            print("Error : \(error)")
         }
+        
+        /*
+             let encoder = PropertyListEncoder()
+             do {
+                 let data = try encoder.encode(self.itemArray)
+                 try data.write(to: self.filePath!)
+             } catch {
+                 print("Catched Array while inserting \(error)")
+             }
+         */
         
         //self.defaults.setValue(self.itemArray, forKey: "toDoList") // userDefaults Data insert
         self.tableView.reloadData()
     }
     
-    
+    //MARK: - Load DATA
     func loadData(){
-        if let data = try? Data(contentsOf: filePath!){
-            let decoder  = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print("Errors are \(error)")
+        
+        /*
+         
+            if let data = try? Data(contentsOf: filePath!){
+                let decoder  = PropertyListDecoder()
+                do {
+                    itemArray = try decoder.decode([ItemOld].self, from: data)
+                } catch {
+                    print("Errors are \(error)")
+                }
+               
             }
-           
-        }
+            -Codable ProperyList to fixed Directory (filePath)
+         */
         
        /*
-        if let items = defaults.object(forKey: "toDoList") as? [Item] {
-            itemArray = items
-        }
-        - Loading data from userDefaults
+            if let items = defaults.object(forKey: "toDoList") as? [Item] {
+                itemArray = items
+            }
+            - Loading data from userDefaults
         */
     }
     
@@ -114,6 +134,7 @@ class TodoeyViewController: UITableViewController {
 
 
 
+//MARK: - HARD CODED ARRAY
 /*
  hardCoded Array:
  //var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t" ]

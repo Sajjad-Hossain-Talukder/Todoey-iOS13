@@ -9,7 +9,7 @@
 import Foundation
 
 
-struct Item : Encodable, Decodable {
+struct ItemOld : Encodable, Decodable {
     let title : String
     var done : Bool = false
 }
